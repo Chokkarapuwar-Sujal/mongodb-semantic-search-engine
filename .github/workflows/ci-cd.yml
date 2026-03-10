@@ -1,37 +1,106 @@
 name: CI-CD
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: ["main"]
+    paths-ignore:
+      - "README.md"
+      - "docs/**"
   pull_request:
     branches: ["main"]
+    paths-ignore:
+      - "README.md"
+      - "docs/**"
 
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "npm"
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
 
+      # Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: ai-service/requirements.txt
 
+      # Install backend dependencies
       - name: Install backend dependencies
         run: |
           cd backend
           npm ci
 
+      # Run npm security audit
+      - name: Run npm security audit
+        run: |
+          cd backend
+          npm audit --audit-level=high || true
+
+      # Install AI service dependencies
+      - name: Install AI service dependencies
+        run: |
+          cd ai-service
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Check Python dependencies
+      - name: Check Python dependencies
+        run: |
+          cd ai-service
+          pip install pip-audit
+          pip-audit || true
+
+      # Run AI service tests
+      - name: Run AI service tests
+        run: |
+          cd ai-service
+          PYTHONPATH=. pytest -q
+
+      # Start AI service for backend tests
+      - name: Start AI service
+        run: |
+          cd ai-service
+          uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+          echo "Waiting for AI service..."
+
+          # Wait until the service is actually ready before running backend tests.
+          ready=false
+          for i in {1..30}; do
+            if curl -fsS http://localhost:8000/health > /dev/null; then
+              echo "AI service is ready"
+              ready=true
+              break
+            fi
+            sleep 2
+          done
+
+          if [ "$ready" != true ]; then
+            echo "AI service failed to become ready in time"
+            exit 1
+          fi
+
+      # Run backend tests
       - name: Run backend tests
         env:
-          MONGO_URI: mongodb+srv://example:example@example.mongodb.net
+          MONGO_URI: ${{ secrets.MONGO_URI }}
           MONGO_DB: semantic_search
           MONGO_COLLECTION: documents
           AI_SERVICE_URL: http://localhost:8000
@@ -39,38 +108,32 @@ jobs:
           cd backend
           npm test
 
+      # Install frontend dependencies
       - name: Install frontend dependencies
         run: |
           cd frontend
           npm ci
 
+      # Build frontend
       - name: Build frontend
         run: |
           cd frontend
           npm run build
 
-      - name: Install AI service dependencies
-        run: |
-          cd ai-service
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run AI service tests
-        run: |
-          cd ai-service
-          pytest -q
-
+      # Build Docker images
       - name: Build Docker images
         run: |
           docker build -t semantic-frontend ./frontend
           docker build -t semantic-backend ./backend
           docker build -t semantic-ai-service ./ai-service
 
+      # Push Docker images (placeholder)
       - name: Push images (example)
         if: github.ref == 'refs/heads/main'
         run: |
           echo "Configure registry login and docker push commands here"
 
+      # Deploy (placeholder)
       - name: Deploy (example)
         if: github.ref == 'refs/heads/main'
         run: |
