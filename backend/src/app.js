@@ -1,0 +1,18 @@
+const express = require("express");
+const cors = require("cors");
+const env = require("./config/env");
+const searchRoutes = require("./routes/searchRoutes");
+const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
+
+const app = express();
+
+app.use(cors({ origin: env.corsOrigin }));
+app.use(express.json({ limit: "1mb" }));
+
+app.get("/health", (req, res) => res.json({ status: "ok" }));
+app.use("/api", searchRoutes);
+
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+module.exports = app;

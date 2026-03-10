@@ -1,0 +1,29 @@
+[
+  {
+    "title": "MongoDB Query Optimization Guide",
+    "content": "Use compound indexes, avoid unbounded sorts, and use covered queries to improve MongoDB query performance.",
+    "metadata": {
+      "author": "DB Team",
+      "tags": ["mongodb", "performance", "indexing"],
+      "createdAt": "2026-01-10T10:00:00.000Z"
+    }
+  },
+  {
+    "title": "Scaling Node.js APIs",
+    "content": "Horizontal scaling, caching hot routes, and non-blocking I/O are core patterns for high-throughput Node.js APIs.",
+    "metadata": {
+      "author": "Platform Team",
+      "tags": ["nodejs", "api", "scalability"],
+      "createdAt": "2026-01-14T15:00:00.000Z"
+    }
+  },
+  {
+    "title": "Designing Semantic Search",
+    "content": "Semantic search compares vector representations of text instead of exact keyword matches, improving retrieval quality.",
+    "metadata": {
+      "author": "AI Team",
+      "tags": ["nlp", "semantic-search", "vector"],
+      "createdAt": "2026-01-20T08:30:00.000Z"
+    }
+  }
+]

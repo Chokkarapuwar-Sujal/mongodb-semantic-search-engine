@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-a: #f8fafc;
+  --bg-b: #ecfeff;
+  --bg-c: #ffedd5;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "IBM Plex Sans", sans-serif;
+  background: radial-gradient(circle at 15% 20%, var(--bg-b), transparent 45%),
+    radial-gradient(circle at 85% 10%, var(--bg-c), transparent 35%),
+    linear-gradient(180deg, var(--bg-a), #f1f5f9);
+  color: #0f172a;
+}
+
+@keyframes fade-slide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-slide {
+  animation: fade-slide 320ms ease-out;
+}

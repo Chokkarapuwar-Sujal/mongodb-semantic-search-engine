@@ -1,0 +1,8 @@
+services:
+  backend:
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+  ai-service:
+    environment:
+      - LOG_LEVEL=debug
