@@ -89,7 +89,7 @@ mongodb-semantic-search-engine/
 First clone the project from GitHub:
 
 ```bash
-git clone https://github.com/<your-username>/mongodb-semantic-search-engine.git
+git clone https://github.com/Chokkarapuwar-Sujal/mongodb-semantic-search-engine.git
 cd mongodb-semantic-search-engine
 ```
 
@@ -304,7 +304,3 @@ Add screenshots here after running the UI:
 This project is licensed under the MIT License.
 
 See the `LICENSE` file for details.
-
-## Author
-
-Developed as a demonstration project for **AI-powered semantic search using MongoDB Vector Search**.
