@@ -1,0 +1,77 @@
+name: CI-CD
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Run backend tests
+        env:
+          MONGO_URI: mongodb+srv://example:example@example.mongodb.net
+          MONGO_DB: semantic_search
+          MONGO_COLLECTION: documents
+          AI_SERVICE_URL: http://localhost:8000
+        run: |
+          cd backend
+          npm test
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Install AI service dependencies
+        run: |
+          cd ai-service
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run AI service tests
+        run: |
+          cd ai-service
+          pytest -q
+
+      - name: Build Docker images
+        run: |
+          docker build -t semantic-frontend ./frontend
+          docker build -t semantic-backend ./backend
+          docker build -t semantic-ai-service ./ai-service
+
+      - name: Push images (example)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "Configure registry login and docker push commands here"
+
+      - name: Deploy (example)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "Add deployment command for ECS, Cloud Run, or Azure Container Apps"
